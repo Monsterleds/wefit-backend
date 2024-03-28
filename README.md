@@ -1,4 +1,4 @@
-## OverEngineering em um formulário simples xD
+## Desafio Wefit (OverEngineering em um formulário simples xD)
 
 Respondendo algumas perguntas previamente:
 
@@ -33,6 +33,7 @@ Assim vem as abordagens técnicas (dado a necessidade):
 - Teremos que fazer algumas validações, ex: se email já existe, então no dia vai realizar 50 milhões de consultas no banco de dados verificando se aquele usuário já existe, talvez replicar o banco apenas para consultas e indexar essas colunas?
 - Sistema de filas, caso o service responsável por subir esses dados caia ou não consiga salvar corretamente, assim subindo em uma fila de retry e no ultimo caso, em uma DLQ (Dead Letter Queue) para uma futura análise manual do pq esses carinhas não subiram (não teve tempo para fila de retry e DLQs).
 - Rate Limiters e outras funcionalidades (usar container do docker talvez?) para ajudar na segurança da nossa aplicação (sem tempo tbm kk).
+- Master-slave nos bancos de dados, o banco de dados master apenas para writes e a slave apenas para readings (por conta da grande massa de requisições e validações).
 
 dava para utilizar APM's, como New Relic, DataDog, Graphana, Prometheus Kibana, etc. Para fazer a gestão, análise e previsão de futuros erros com os logs, ou até mesmo criar um container pra simular um loadbalancer mas só tenho 2 dias então vou deixar para a próxima xD.
 
