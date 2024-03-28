@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mysql_db_master:
+    platform: linux/x86_64
+    image: mysql:5.6
+    restart: unless-stopped
+    env_file: ./.env
+    container_name: "mysql_db_master"
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    ports:
+      - $MYSQLDB_PORT:3306
+    volumes:
+      - ./data/master/:/var/lib/mysql
+      - ./configs/databases/mysql/master/:/etc/mysql/conf.d/
+    networks:
+      - mysql-network
+
+  mysql_db_slave:
+    platform: linux/x86_64
+    image: mysql:5.6
+    restart: unless-stopped
+    env_file: ./.env
+    container_name: "mysql_db_slave"
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    ports:
+      - $MYSQLDB_SLAVE_PORT:3306
+    depends_on:
+      - mysql_db_master
+    volumes:
+      - ./data/slave/:/var/lib/mysql
+      - ./configs/databases/mysql/slave/:/etc/mysql/conf.d/
+    networks:
+      - mysql-network
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_VHOST=$RABBITMQ_DEFAULT_VHOST
+    volumes:
+      - ./data/rabbit/data:/var/lib/rabbitmq
+      - ./data/rabbit/log:/var/log/rabbitmq
+      - ./data/rabbit/etc:/etc/rabbitmq
+    restart: always
+
+networks:
+  mysql-network:
